@@ -10,7 +10,7 @@ class User(Base):
     first_name = Column(String)
     last_name = Column(String)
     age = Column(Integer)
-    balance = Column(Integer)
+    balance = Column(Integer, default=1000)
     username = Column(String)
     password = Column(String)
     member_type = Column(String)
