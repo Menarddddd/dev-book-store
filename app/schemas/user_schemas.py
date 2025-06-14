@@ -9,3 +9,7 @@ class CreateUser(BaseModel):
     username: str
     password: str
     member_type: str
+
+
+class OrderedBooks(BaseModel):
+    title: str

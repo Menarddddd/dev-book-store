@@ -22,9 +22,12 @@ def login(formData: OAuth2PasswordRequestForm = Depends(), db: Session = Depends
     return user_services.login_service(formData, db)
 
 
+
 @route.post("/create_user", status_code=status.HTTP_201_CREATED)
 def create_user(formData: user_schemas.CreateUser, db: Session = Depends(get_db)):
     return user_services.create_user_service(formData, db)
+
+
 
 @route.get("/get_books", status_code=status.HTTP_200_OK, response_model=List[AllBookReponse])
 def get_books(
@@ -37,3 +40,9 @@ def get_books(
         query = query.limit(limit)
 
     return query.all()
+
+
+
+@route.post("/order_books", status_code=status.HTTP_200_OK)
+def order_books(orderedBooks: List[user_schemas.OrderedBooks], db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    return user_services.order_books_service(orderedBooks, db, current_user)

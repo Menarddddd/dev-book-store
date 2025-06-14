@@ -1,4 +1,7 @@
+import random
+from typing import List
 from app.core import hashing
+from app.models.book import Book
 from app.models.user import User
 from ..schemas import user_schemas
 from sqlalchemy.orm import Session
@@ -8,6 +11,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from ..core import hashing
 from ..core import security
 from ..models.seller import Seller
+from ..models.order import Order
+from datetime import datetime
 
 
 
@@ -84,3 +89,44 @@ def create_user_service(formData: user_schemas.CreateUser, db: Session):
         content={"message": f"User account for {formData.username} created successfully"}
     )
 
+
+def generate_unique_order_id(db: Session, length=10):
+    while True:
+        order_id = "".join(random.choices("0123456789", k=length))
+        exists = db.query(Order).filter(Order.id == order_id).first()
+        if not exists:
+            return order_id
+        
+
+def get_time_now():
+    now = datetime.now()
+    formatted = now.strftime("%Y-%m-%d %H:%M")
+    return formatted
+        
+def get_book_id(title: str, db: Session):
+    book = db.query(Book).filter(Book.title == title).first()
+    return book.id if book else None
+
+def order_books_service(orderedBooks: List[user_schemas.OrderedBooks], db: Session, current_user: User):
+    books_id = []
+    for book in orderedBooks:
+        # book is OrderedBooks object, pass only title string here:
+        result = get_book_id(book.title, db)
+        if result is None:
+            raise ValueError(f"Book with title '{book.title}' not found")
+        books_id.append(result)
+
+    order_id = generate_unique_order_id(db)
+
+    new_order = Order(
+        id=order_id,
+        customer_id=current_user.id,
+        books_id=books_id,
+        time_order=datetime.now(),
+        original_price=0,
+        discounted_price=0,
+        total_amount=0
+    )
+    db.add(new_order)
+    db.commit()
+    return "Ordered books placed successfully"

@@ -14,5 +14,4 @@ class Book(Base):
     available = Column(Boolean)
     seller_id = Column(Integer, ForeignKey("sellers.id"))
 
-    order = relationship("Order", back_populates="books")
     seller = relationship("Seller", back_populates="property") 
