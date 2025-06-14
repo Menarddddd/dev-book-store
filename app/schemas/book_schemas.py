@@ -10,3 +10,15 @@ class CreateBook(BaseModel):
     price: int
     available: bool
     
+
+class AllBookReponse(BaseModel):
+    id: int
+    title: str
+    author: str
+    genre: List[str]
+    price: int
+    available: bool
+
+    model_config = {
+        "from_attributes": True
+    }
