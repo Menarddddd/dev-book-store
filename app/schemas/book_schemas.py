@@ -18,6 +18,7 @@ class AllBookReponse(BaseModel):
     genre: List[str]
     price: int
     available: bool
+    seller_id: int
 
     model_config = {
         "from_attributes": True

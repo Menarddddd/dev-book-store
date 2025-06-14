@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Query, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -27,5 +27,13 @@ def create_user(formData: user_schemas.CreateUser, db: Session = Depends(get_db)
     return user_services.create_user_service(formData, db)
 
 @route.get("/get_books", status_code=status.HTTP_200_OK, response_model=List[AllBookReponse])
-def get_books(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    return db.query(Book).all()
+def get_books(
+    limit: int = Query(None, le=15),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+    ):
+    query = db.query(Book)
+    if limit is not None:
+        query = query.limit(limit)
+
+    return query.all()
