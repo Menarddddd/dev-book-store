@@ -20,3 +20,7 @@ def login(formData: OAuth2PasswordRequestForm = Depends(), db: Session = Depends
 @route.post("/create_user", status_code=status.HTTP_201_CREATED)
 def create_user(formData: user_schemas.CreateUser, db: Session = Depends(get_db)):
     return user_services.create_user_service(formData, db)
+
+@route.get("get_books", status_code=status.HTTP_200_OK)
+def get_books(db: Session = Depends(get_db)):
+    pass

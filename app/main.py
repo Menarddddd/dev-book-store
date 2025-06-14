@@ -4,7 +4,7 @@ from .models.book import Book
 from .models.order import Order
 from .models.seller import Seller
 from .database.database import Base, engine
-from .routes import user_routes
+from .routes import user_routes, seller_routes
 
 
 app = FastAPI()
@@ -12,3 +12,4 @@ app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 app.include_router(user_routes.route)
+app.include_router(seller_routes.route)

@@ -7,10 +7,12 @@ class Order(Base):
 
     id = Column(Integer, primary_key=True)
     customer_id = Column(Integer, ForeignKey("users.id"))
+    books_id = Column(Integer, ForeignKey("books.id"))
     time_order = Column(DateTime)
     original_price = Column(Integer)
     discounted_price = Column(Integer)
     total_amount = Column(Integer)
 
-    customer = relationship("User", back_populates="orders")
     books = relationship("Book", back_populates="order")
+    customer = relationship("User", back_populates="orders")
+ 

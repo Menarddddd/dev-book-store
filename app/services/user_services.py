@@ -7,9 +7,11 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from ..core import hashing
 from ..core import security
+from ..models.seller import Seller
 
 
 
+#Seller also use these
 def check_names_length(name: str):
     return len(name) >= 3
 
@@ -30,9 +32,12 @@ def check_age(age: int):
 
 
 
-
+# seller also use this
 def login_service(formData: OAuth2PasswordRequestForm, db: Session):
     user = db.query(User).filter(User.username == formData.username).first()
+    if not user:
+        user = db.query(Seller).filter(Seller.username == formData.username).first()
+
     if not user:
         HTTPError.not_found("User is not found")
         
@@ -67,7 +72,8 @@ def create_user_service(formData: user_schemas.CreateUser, db: Session):
         age = formData.age,
         username = formData.username,
         password = hashed_password,
-        member_type = formData.member_type
+        member_type = formData.member_type,
+        role = User.__name__.lower()
     )
 
     db.add(new_user)

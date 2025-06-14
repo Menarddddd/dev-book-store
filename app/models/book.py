@@ -10,11 +10,9 @@ class Book(Base):
     title = Column(String)
     author = Column(String)
     genre = Column(JSON)
-    member_type = Column(String)
+    price = Column(Integer)
     available = Column(Boolean)
-    order_id = Column(Integer, ForeignKey("orders.id")) 
     seller_id = Column(Integer, ForeignKey("sellers.id"))
 
-
     order = relationship("Order", back_populates="books")
-    seller = relationship("Seller", back_populates="property")
+    seller = relationship("Seller", back_populates="property") 

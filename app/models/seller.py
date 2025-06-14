@@ -10,7 +10,9 @@ class Seller(Base):
     first_name = Column(String)
     last_name = Column(String)
     age = Column(Integer)
+    balance = Column(Integer, default=1000)
     username = Column(String)
     password = Column(String)
+    role = Column(String) 
 
     property = relationship("Book", back_populates="seller")
