@@ -4,6 +4,9 @@ from ..schemas import user_schemas
 from sqlalchemy.orm import Session
 from ..core.errors import HTTPError, validateFormInput, run_validations
 from fastapi.responses import JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from ..core import hashing
+from ..core import security
 
 
 
@@ -22,6 +25,23 @@ def check_password_has_int(password: str):
 def check_age(age: int):
     return isinstance(age, int) and age > 0
 
+
+
+
+
+
+
+def login_service(formData: OAuth2PasswordRequestForm, db: Session):
+    user = db.query(User).filter(User.username == formData.username).first()
+    if not user:
+        HTTPError.not_found("User is not found")
+        
+    result = hashing.verify_password(formData.password, user.password)
+    if not result:
+        HTTPError.unauthorized("Password is incorrect")
+
+    access_token = security.create_access_token(data={"sub": formData.username})
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 

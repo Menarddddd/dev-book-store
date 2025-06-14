@@ -6,3 +6,4 @@ passlib
 bcrypt
 python-dotenv
 sqlalchemy
+pydantic-settings
