@@ -15,7 +15,7 @@ from ..core.security import get_current_user
 route = APIRouter(
     tags=["User"]
 )
-
+ 
 
 @route.post("/token", status_code=status.HTTP_200_OK)
 def login(formData: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
