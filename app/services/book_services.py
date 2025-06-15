@@ -19,7 +19,7 @@ def create_book(book: CreateBook, db: Session, seller_id: int):
     db.add(new_book)
     db.commit()
 
-    return JSONResponse(
+    return JSONResponse( 
         status_code = status.HTTP_201_CREATED,
         content = {"message": f"Book {book.title} is for sale now!"}
 
