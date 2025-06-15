@@ -10,7 +10,7 @@ class Order(Base):
     books_id = Column(JSON)
     time_order = Column(DateTime)
     original_price = Column(Integer)
-    discounted_price = Column(Integer)
+    discounted_amount = Column(Integer)
     total_amount = Column(Integer)
 
     customer = relationship("User", back_populates="orders")

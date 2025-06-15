@@ -13,6 +13,7 @@ from ..core import security
 from ..models.seller import Seller
 from ..models.order import Order
 from datetime import datetime
+from .order_services import get_member_discount
 
 
 
@@ -102,19 +103,33 @@ def get_time_now():
     now = datetime.now()
     formatted = now.strftime("%Y-%m-%d %H:%M")
     return formatted
-        
-def get_book_id(title: str, db: Session):
+
+def get_book(title: str, db:Session):
     book = db.query(Book).filter(Book.title == title).first()
-    return book.id if book else None
+    return book
 
 def order_books_service(orderedBooks: List[user_schemas.OrderedBooks], db: Session, current_user: User):
     books_id = []
+    original_price = 0
+    discounted_amount = 0
+    total_amount = 0
+    print(orderedBooks)
+
     for book in orderedBooks:
-        # book is OrderedBooks object, pass only title string here:
-        result = get_book_id(book.title, db)
-        if result is None:
-            raise ValueError(f"Book with title '{book.title}' not found")
-        books_id.append(result)
+        print(original_price)
+        print(discounted_amount)
+        print(total_amount)
+        print(f"book: {book}")
+        bookObject = get_book(book.title, db)
+        if bookObject is None:
+            HTTPError.not_found("Book is not found!")
+        books_id.append(bookObject.id)
+        result_discount = get_member_discount(current_user.member_type, bookObject.price)
+        discounted_amount += result_discount["discounted_amount"]
+        total_amount += result_discount["total_amount"]
+        original_price += bookObject.price
+
+
 
     order_id = generate_unique_order_id(db)
 
@@ -123,9 +138,9 @@ def order_books_service(orderedBooks: List[user_schemas.OrderedBooks], db: Sessi
         customer_id=current_user.id,
         books_id=books_id,
         time_order=datetime.now(),
-        original_price=0,
-        discounted_price=0,
-        total_amount=0
+        original_price=original_price,
+        discounted_amount=discounted_amount,
+        total_amount=total_amount
     )
     db.add(new_order)
     db.commit()

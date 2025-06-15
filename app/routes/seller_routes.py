@@ -4,6 +4,7 @@ from fastapi import Depends, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
+from app.schemas.order_schemas import OrderResponse
 from app.services import seller_services
 from ..database.database import get_db
 from ..schemas import seller_schemas, book_schemas
@@ -28,15 +29,10 @@ def create_seller(formData: seller_schemas.CreateSeller, db: Session = Depends(g
 
 @route.post("/post_books")
 def post_books_online(books: List[book_schemas.CreateBook], db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    if current_user.role == "user":
-        HTTPError.unauthorized("User is not allowed to post books online")
+    return seller_services.post_books_online_service(books, db, current_user)
 
-    seller_id = current_user.id
 
-    for book in books:
-        book_services.create_book(book, db, seller_id)
+@route.get("/get_orders", response_model=List[OrderResponse])
+def get_orders(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
+    return seller_services.get_orders_service(db, current_user)
 
-    return JSONResponse(
-        status_code = status.HTTP_201_CREATED,
-        content = {"message": "Books created successfully!"}
-    )

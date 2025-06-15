@@ -46,3 +46,10 @@ def get_books(
 @route.post("/order_books", status_code=status.HTTP_200_OK)
 def order_books(orderedBooks: List[user_schemas.OrderedBooks], db: Session = Depends(get_db), current_user = Depends(get_current_user)):
     return user_services.order_books_service(orderedBooks, db, current_user)
+
+# send something like this!
+# [
+#   { "title": "The Hobbit" },
+#   { "title": "The Catcher in the Rye" },
+#   { "title": "The Great Gatsby" }
+# ]
