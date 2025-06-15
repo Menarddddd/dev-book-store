@@ -13,7 +13,7 @@ from ..core import security
 from ..models.seller import Seller
 from ..models.order import Order
 from datetime import datetime
-from .order_services import get_member_discount
+from .order_services import get_member_discount, is_eligible
 
 
 
@@ -108,18 +108,14 @@ def get_book(title: str, db:Session):
     book = db.query(Book).filter(Book.title == title).first()
     return book
 
-def order_books_service(orderedBooks: List[user_schemas.OrderedBooks], db: Session, current_user: User):
+
+def order_book_with_discount(orderedBooks: List[user_schemas.OrderedBooks], db: Session, current_user: User):
     books_id = []
     original_price = 0
     discounted_amount = 0
     total_amount = 0
-    print(orderedBooks)
 
     for book in orderedBooks:
-        print(original_price)
-        print(discounted_amount)
-        print(total_amount)
-        print(f"book: {book}")
         bookObject = get_book(book.title, db)
         if bookObject is None:
             HTTPError.not_found("Book is not found!")
@@ -145,3 +141,41 @@ def order_books_service(orderedBooks: List[user_schemas.OrderedBooks], db: Sessi
     db.add(new_order)
     db.commit()
     return "Ordered books placed successfully"
+
+
+
+def order_book_no_discount(orderedBooks: List[user_schemas.OrderedBooks], db: Session, current_user: User):
+    books_id = []
+    original_price = 0
+
+    for book in orderedBooks:
+        bookObject = get_book(book.title, db)
+        if bookObject is None:
+            HTTPError.not_found("Book is not found!")
+        books_id.append(bookObject.id)
+        original_price += bookObject.price
+
+
+
+    order_id = generate_unique_order_id(db)
+
+    new_order = Order(
+        id=order_id,
+        customer_id=current_user.id,
+        books_id=books_id,
+        time_order=datetime.now(),
+        original_price=original_price,
+        discounted_amount=0,
+        total_amount=original_price
+    )
+    db.add(new_order)
+    db.commit()
+    return "Ordered books placed successfully"
+
+
+
+def order_books_service(orderedBooks: List[user_schemas.OrderedBooks], db: Session, current_user: User):
+    applicable = is_eligible(current_user.member_type)
+    print(f"member_type: {current_user.member_type}")
+    print(applicable)
+    return order_book_with_discount(orderedBooks, db, current_user) if applicable else order_book_no_discount(orderedBooks, db, current_user)
