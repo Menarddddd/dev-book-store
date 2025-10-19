@@ -1,1 +1,1 @@
-This is a simple lending book api
+This is a simple book store api
